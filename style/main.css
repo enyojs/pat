@@ -1,0 +1,38 @@
+html {
+	margin: 0 0;
+	padding: 0 0;
+	overflow: hidden;
+}
+
+body {
+	font-family: arial, helvetica, sans-serif;
+	margin: 0 0;
+	padding: 0 0;
+	background: #fff;
+}
+
+#container {
+	position: absolute;
+	top: 300px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow: hidden;
+}
+
+.circle {
+	float: left;
+	box-sizing: border-box;
+	position: relative;
+	padding: 2px;
+	border-radius: 45px;
+	width: 25px;
+	height: 25px;
+	line-height: 22px;
+	vertical-align: middle;
+	text-align: center;
+	margin: 10px;
+	background-color: #000;
+	color: #fff;
+	-webkit-transform: translate3d(0px, 0px, 10px);
+}

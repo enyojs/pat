@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+		<title>Render Performance Tests</title>
+		<meta http-equiv='Content-Type' content='text/html; charset=utf8'/>
+		<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'/>
+
+		<!-- stylesheets -->
+		<link rel='stylesheet' type='text/css' href='style/main.css' />
+		<link rel='stylesheet' type='text/css' href='style/controls.css' />
+	</head>
+	<body>
+		
+		<div id='controls'>
+			<div id='delegates'>
+				<h2>Delegates</h2>
+				<select id='delegates-list' onchange='delegateChanged();'>
+					<option value='direct'>direct (in-dom, css position)</option>
+					<option value='indirect'>indrect (out-of-dom, css position)</option>
+					<option value='absolute'>absolute (in-dom, absolutely positioned)</option>
+					<option value='absolute-doc-frag'>absolute (out-of-dom; frag, absolutely positioned)</option>
+				</select>
+			</div>
+			<div id='options'>
+				<h2>Options</h2>
+				<div>
+					<label for='circle-count'>Circles</label>
+					<input id='circle-count' type='text' value='10' />
+				</div>
+				<div>
+					<label for='animate'>Animate</label>
+					<input id='animate' type='checkbox' checked />
+				</div>
+				<div>
+					<label for='change-color'>Colors</label>
+					<input id='change-color' type='checkbox' checked />
+				</div>
+				<div>
+					<label for='no-innerhtml'>Content</label>
+					<input id='no-innerhtml' type='checkbox' checked />
+				</div>
+				<div>
+					<label for='one-at-a-time'>One at a time</label>
+					<input id='one-at-a-time' type='checkbox' />
+				</div>
+				<div>
+					<label for='raf'>rAF</label>
+					<input id='raf' type='checkbox' checked />
+				</div>
+			</div>
+			<div id='commands'>
+				<h2>Commands</h2>
+				<button onclick='start();'>Start</button>
+				<button onclick='stop();'>Stop</button>
+				<button onclick='reset();'>Reset</button>
+			</div>
+		</div>
+		
+		<div id='container'>
+		</div>
+		
+		<!-- scripts -->
+		<script type='text/javascript' src='js/shared.js'></script>
+		<script type='text/javascript' src='js/delegate.js'></script>
+		<script type='text/javascript' src='js/delegates/direct.js'></script>
+		<script type='text/javascript' src='js/delegates/indirect.js'></script>
+		<script type='text/javascript' src='js/delegates/absolute.js'></script>
+		<script type='text/javascript' src='js/delegates/absolute-doc-frag.js'></script>
+		<script type='text/javascript'>
+			delegateChanged();
+		</script>
+	</body>
+</html>

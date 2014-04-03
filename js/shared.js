@@ -23,6 +23,10 @@
 		return Boolean(document.getElementById('raf').checked);
 	};
 	
+	window.getRecord = function () {
+		return Boolean(document.getElementById('record').checked);
+	};
+	
 	window.getContent = function () {
 		return Boolean(document.getElementById('no-innerhtml').checked);
 	};
@@ -38,6 +42,10 @@
 		return document.getElementById('container');
 	};
 	
+	window.getResultsNode = function () {
+		return document.getElementById('results');
+	};
+	
 	window.clearRootNode = function () {
 		var el = getRootNode();
 		el.innerHTML = '';
@@ -50,7 +58,8 @@
 			oneAtATime: getOneAtATime(),
 			rAF: getRAF(),
 			count: getCircleCount(),
-			content: getContent()
+			content: getContent(),
+			record: getRecord()
 		};
 	};
 	
@@ -88,6 +97,20 @@
 		stop();
 		if (delegate) delegate.reset();
 		else clearRootNode();
+	};
+	
+	window.generateResultElement = function (label, value) {
+		var el = document.createElement('tr')
+			, ltd = document.createElement('td')
+			, vtd = document.createElement('td');
+		el.className = 'result-container';
+		ltd.innerHTML = label;
+		ltd.className = 'label';
+		vtd.innerHTML = value;
+		vtd.className = 'value';
+		el.appendChild(ltd);
+		el.appendChild(vtd);
+		return el;
 	};
 	
 })(window);

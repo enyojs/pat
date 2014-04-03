@@ -55,13 +55,14 @@
 		},
 		
 		tick: function () {
+			Delegate.prototype.tick.call(this);
+			
 			var frame = this.generateFrame()
 				, root = this.root || (this.root = getRootNode());
 			
 			root.innerHTML = '';
 			root.appendChild(frame);
-			
-			if (this.rAF) this.job = requestAnimationFrame(this.tick.bind(this));
+			this.next();
 		}
 	});
 	

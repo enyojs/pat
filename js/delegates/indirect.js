@@ -3,6 +3,8 @@
 	new Delegate({
 		name: 'indirect',
 		tick: function () {
+			Delegate.prototype.tick.call(this);
+			
 			var root = getRootNode()
 				, pn = root.parentNode
 				, count = (++this.counter)
@@ -38,7 +40,7 @@
 			
 			pn.appendChild(root);
 			
-			if (this.rAF) this.job = requestAnimationFrame(this.tick.bind(this));
+			this.next();
 		}
 	});
 	

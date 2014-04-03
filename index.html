@@ -48,6 +48,10 @@
 					<label for='raf'>rAF</label>
 					<input id='raf' type='checkbox' checked />
 				</div>
+				<div>
+					<label for='record'>Record</label>
+					<input id='record' type='checkbox' />
+				</div>
 			</div>
 			<div id='commands'>
 				<h2>Commands</h2>
@@ -55,12 +59,19 @@
 				<button onclick='stop();'>Stop</button>
 				<button onclick='reset();'>Reset</button>
 			</div>
+			<div>
+				<h2>Results</h2>
+				<table id='results'>
+					
+				</table>
+			</div>
 		</div>
 		
 		<div id='container'>
 		</div>
 		
 		<!-- scripts -->
+		<script type='text/javascript' src='js/perf.js'></script>
 		<script type='text/javascript' src='js/shared.js'></script>
 		<script type='text/javascript' src='js/delegate.js'></script>
 		<script type='text/javascript' src='js/delegates/direct.js'></script>

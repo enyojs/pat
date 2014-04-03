@@ -3,6 +3,8 @@
 	new Delegate({
 		name: 'direct',
 		tick: function () {
+			Delegate.prototype.tick.call(this);
+			
 			var root = getRootNode()
 				, count = (++this.counter)
 				, oaat = this.oneAtATime
@@ -33,7 +35,7 @@
 				if (this.changeColor) el.style.backgroundColor = 'rgb(0,0,' + (count % 255) + ')';
 			}
 			
-			if (this.rAF) this.job = requestAnimationFrame(this.tick.bind(this));
+			this.next();
 		}
 	});
 	

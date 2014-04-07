@@ -6,30 +6,44 @@
 		<meta http-equiv='Content-Type' content='text/html; charset=utf8'/>
 		<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'/>
 
-		<link rel='stylesheet' type='text/css' href='style/main.css' />
+		<link rel='stylesheet' type='text/css' href='/style/main.css' />
 	</head>
 	<body>
-		<script type='text/javascript' src='/bower_components/jquery/dist/jquery.min.js'></script>
+		<script type='text/javascript' src='/bower_components/jquery/jquery.min.js'></script>
 		<script type='text/javascript' src='/socket.io/socket.io.js'></script>
 		<script type='text/javascript' src='/js/platform.js'></script>
 		<script type='text/javascript' src='/js/shared.js'></script>
 		<script type='text/javascript' src='/js/test.js'></script>
 		<script type='text/javascript' src='/js/socket.js'></script>
 		
-		<div id='test-container'>Loading tests...</div>
+		<div id='header'>
+			<h1>Performance Analysis Tests</h1>
+			<h4 class='platform-info'></h4>
+			<div class='flex'>
+				<div class='tests'></div>
+				<div class='controls'>
+					<input type='button' onclick='selectAllTests();' value='Select All' />
+					<input type='button' onclick='deselectAllTests();' value='Deselect All'/>
+					<input id='run-button' type='button' onclick='runAllTests();' disabled value='Run' />
+				</div>
+			</div>
+		</div>
+		
+		<div id='test-container'></div>
 		
 		<script type='text/javascript'>
-			socket.emit('ready', function (tests) {
-				var len = tests.length;
-				
-				tests.forEach(function (filepath) {
-					var el = document.createElement('script');
-					el.type = 'text/javascript';
-					el.src = filepath;
-					el.onload = function () {
-						--len; if (len === 0) runAllTests();
-					};
-					document.body.appendChild(el);
+			socket.on('connect', function () {
+				socket.emit('get:tests', function (tests) {
+					var len = tests.length;
+					tests.forEach(function (filepath) {
+						var el = document.createElement('script');
+						el.type = 'text/javascript';
+						el.src = filepath;
+						el.onload = function () {
+							--len; if (len === 0) $('#run-button').prop('disabled', false);
+						};
+						document.body.appendChild(el);
+					});
 				});
 			});
 		</script>

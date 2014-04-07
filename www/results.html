@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+		<title>Render Performance Results</title>
+		<meta http-equiv='Content-Type' content='text/html; charset=utf8'/>
+		<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'/>
+
+		<link rel='stylesheet' type='text/css' href='/style/main.css' />
+		<link rel='stylesheet' type='text/css' href='/style/results.css' />
+		<link rel='stylesheet' type='text/css' href='/bower_components/datatables/media/css/jquery.dataTables.css' />
+		<link rel='stylesheet' type='text/css' href='/bower_components/datatables/media/css/jquery.dataTables_themeroller.css' />
+		<link rel='stylesheet' type='text/css' href='/bower_components/jqplot-bower/dist/jquery.jqplot.min.css' />
+	</head>
+	<body>
+		<script type='text/javascript' src='/bower_components/jquery/jquery.min.js'></script>
+		<script type='text/javascript' src='/bower_components/datatables/media/js/jquery.dataTables.js'></script>
+		<script type='text/javascript' src='/bower_components/jqplot-bower/dist/jquery.jqplot.min.js'></script>
+		<script type='text/javascript' src='/bower_components/jqplot-bower/dist/plugins/jqplot.barRenderer.min.js'></script>
+		<script type='text/javascript' src='/socket.io/socket.io.js'></script>
+		<script type='text/javascript' src='/js/platform.js'></script>
+		<script type='text/javascript' src='/js/socket.js'></script>
+		<input type='button' value='Run Tests' onclick='javascript:history.back();' />
+		<div id='results-container'>
+			<div id='chart-results'></div>
+			<table id='table-results'>
+				<thead>
+					<tr>
+						<th>OS</th>
+						<th>Platform</th>
+						<th>Browser</th>
+						<th>Test Name</th>
+						<th>Total</th>
+						<th>Average</th>
+						<th>Max</th>
+						<th>Min</th>
+						<th>Date</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		
+		<script type='text/javascript'>
+			socket.emit('table-results', function (results) {
+				window.tableResults = results.slice();
+				
+				// setup our table
+				var tbody = $('#table-results > tbody')[0];
+				
+				results.forEach(function (row) {
+					$(tbody).append(
+						'<tr>' +
+						'<td>' + row.os + '</td>' +
+						'<td>' + row.platform + '</td>' +
+						'<td>' + row.browser + '</td>' +
+						'<td>' + row.test_name + '</td>' +
+						'<td>' + row.total_time.toFixed(4) + '</td>' +
+						'<td>' + row.average.toFixed(4) + '</td>' +
+						'<td>' + row.max.toFixed(4) + '</td>' +
+						'<td>' + row.min.toFixed(4) + '</td>' +
+						'<td>' + row.date + '</td>' +
+						'</tr>'
+					);
+				});
+				
+				$('#table-results').dataTable({
+					bJQueryUI: true
+				});
+			});
+			socket.emit('bar-chart-results', function (results) {
+				
+				console.log(results);
+				
+				// window.barChartResults = results.slice();
+				
+				// process for our graph
+				// $.jqplot('chart-results', results.map(function (row) {
+				// 	return [row.total_time.toFixed(4)];
+				// }), {
+				// 	pointLabels: {
+				// 		show: true,
+				// 		location: 'e',
+				// 		edgeTolerance: -15
+				// 	},
+				// 	seriesDefaults: {
+				// 		renderer: $.jqplot.BarRenderer,
+				// 		rendererOptions: {
+				// 			fillToZero: true,
+				// 			barDirection: 'horizontal'
+				// 		}
+				// 	}
+				// });
+				
+			});
+		</script>
+	</body>
+</html>

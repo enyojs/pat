@@ -1,15 +1,15 @@
-(function (window) {
+(function (window, platform) {
 	
-	// determine platform
-	var data = window.DATA = {};
-	
-	data.os = platform.os.family;
-	data.browser = platform.name;
-	data.platform = platform.layout;
+	// quick return method to gather the information in a normalized way
+	window.platform = {
+		os: platform.os.family,
+		platform: platform.layout,
+		browser: platform.name
+	};
 	
 	// expose a function that is platform agnostic...
 	window.now = function () {
 		return performance? performance.now(): Date.now();
 	};
 	
-})(window);
+})(window, platform);

@@ -88,7 +88,7 @@ db = new sqlite.Database('results.db', function (err) {
 			db.run('CREATE TABLE IF NOT EXISTS platform (id integer primary key autoincrement, name unique)');
 			db.run('CREATE TABLE IF NOT EXISTS os (id integer primary key autoincrement, name unique)');
 			db.run('CREATE TABLE IF NOT EXISTS browser (id integer primary key autoincrement, name unique)');
-			db.run('CREATE TABLE IF NOT EXISTS result (id integer primary key autoincrement, os, platform, browser, test, data, date CURRENT_TIMESTAMP)');
+			db.run('CREATE TABLE IF NOT EXISTS result (id integer primary key autoincrement, os, platform, browser, test, data, date default CURRENT_TIMESTAMP)');
 		});
 		db.parallelize()
 		// notify that we're running and on what port

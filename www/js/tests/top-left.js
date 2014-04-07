@@ -4,7 +4,7 @@
 		name: 'DOM UPDATE: top-left',
 		description: 'A simple test to profile moving, updating content of, and changing style for DOM elements',
 		run: function () {
-			Test.prototype.run.call(this);
+			CircleTest.prototype.run.call(this);
 			
 			this.counter = 0;
 			this.job = requestAnimationFrame(this.tick.bind(this));
@@ -23,7 +23,7 @@
 				el.style.backgroundColor = 'rgb(0,0,' + (count % 255) + ')';
 			}
 			
-			Test.prototype.tick.call(this);
+			CircleTest.prototype.tick.call(this);
 			
 			if (count < 400) this.job = requestAnimationFrame(this.tick.bind(this));
 			else this.done();

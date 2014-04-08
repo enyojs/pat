@@ -77,29 +77,29 @@ io.sockets.on('connection', function (socket) {
 	
 	// request results for a bar graph of averages per os per test
 	socket.on('get:averages', function (fn) {
-		var tests = [];
+		var oss = [];
 		
-		db.all('SELECT * FROM test', function (err, rows) {
+		db.all('SELECT * FROM os', function (err, rows) {
 			if (!err) {
 				var sql = db.prepare(
 					'SELECT ' +
-						'o.name AS "os", ' +
+						't.name AS "test", ' +
 						'r.data AS "data" ' +
 					'FROM result r JOIN ' +
-						'os o ON o.id = r.os ' +
-					'WHERE r.test = ? ' +
-					'GROUP BY "os" ' +
-					'ORDER BY datetime(r.date) DESC, "os" ASC'
+						'test t ON t.id = r.test ' +
+					'WHERE r.os = ? ' +
+					'GROUP BY "test" ' +
+					'ORDER BY datetime(r.date) DESC, "test" ASC'
 				);
 				
-				rows.forEach(function (test) {
-					sql.all(test.id, function (err, results) {
+				rows.forEach(function (os) {
+					sql.all(os.id, function (err, results) {
 						if (!err) {
-							test.results = results;
-							tests.push(test);
+							os.results = results;
+							oss.push(os);
 							
 							// we must be all done here...
-							if (tests.length == rows.length) fn(tests);
+							if (oss.length == rows.length) fn(oss);
 						} else console.log(err.message);
 					});
 				});

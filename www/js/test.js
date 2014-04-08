@@ -1,17 +1,57 @@
 (function (window) {
 	
-	var tests = []
+	var tests = {}
+		, selectedTests = null
 		, running = false;
 	
-	window.runAllTests = function () {
+	window.getSelectedTests = function () {
+		var el;
+		
+		selectedTests = [];
+		
+		$('#header .tests .test-option').each(function (i, div) {
+			if ((el = $('input', div)).prop('checked')) {
+				selectedTests.push(tests[$(el).prop('value')]);
+			}
+		});
+		
+		return selectedTests;
+	};
+	
+	window.selectAllTests = function () {
+		$('#header .tests input').each(function (i, el) {
+			$(el).prop('checked', true);
+		});
+		getSelectedTests();
+	};
+	
+	window.deselectAllTests = function () {
+		$('#header .tests input').each(function (i, el) {
+			$(el).prop('checked', false);
+		});
+		getSelectedTests();
+	};
+	
+	window.runTests = function () {
 		if (!running) {
-			var test = tests.shift();
-			if (test) test.run();
+			getSelectedTests();
+			nextTest();
+		}
+	};
+	
+	window.nextTest = function () {
+		if (!running && selectedTests) {
+			var test = selectedTests.shift();
+			if (test) {
+				$('#header .running-test .name').html(test.name);
+				$('#header .running-test .description').html(test.description);
+				test.run();
+			}
 		}
 	};
 	
 	function addTest (test) {
-		tests.push(test);
+		tests[test.name] = test;
 		
 		// ensure that the datasource knows about this particular test
 		socket.emit('set:test', {name: test.name, description: test.description});
@@ -19,7 +59,7 @@
 		// add a selectable option for this particular test
 		$('#header .tests').append($(
 			'<div class="test-option">' +
-				'<input type="checkbox" checked />' +
+				'<input type="checkbox" value="' + test.name + '" checked />' +
 				'<span>' + test.name + '</span>' +
 			'</div>'
 		));
@@ -58,18 +98,14 @@
 		done: function () {
 			this.save();
 			running = false;
-			runAllTests();
+			nextTest();
 		},
 		
 		save: function () {
 			// we send the test result to the source so that it can store it in the
 			// database for analysis later
 			socket.emit('set:result', $.extend({}, platform, {name: this.name, result: this.results}), function () {
-				var idx = -1;
-				tests.forEach(function (test, i) {
-					if (test === this) idx = i;
-				}, this);
-				idx > -1 && tests.splice(idx, 1);
+				// @TODO!
 			});
 		},
 		

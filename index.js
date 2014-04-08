@@ -56,12 +56,54 @@ io.sockets.on('connection', function (socket) {
 	// request results for the table that have all entries that can be sorted/filtered in the browser
 	socket.on('get:results', function (fn) {
 		db.all(
-			'SELECT o.name AS "os", b.name AS "browser", p.name AS "platform", r.data AS "data" FROM result r JOIN ' +
-			'os o ON o.id = r.os JOIN platform p ON p.id = r.platform JOIN browser b ON b.id = r.browser JOIN ' +
-			'test t ON t.id = r.test ORDER BY datetime(r.date) DESC'
+			'SELECT ' +
+				'o.name AS "os", ' +
+				'b.name AS "browser", ' +
+				'p.name AS "platform", ' +
+				'r.data AS "data", ' +
+				't.name AS "test", ' +
+				'r.date AS "date" ' +
+			'FROM result r JOIN ' +
+				'os o ON o.id = r.os JOIN ' +
+				'platform p ON p.id = r.platform JOIN ' +
+				'browser b ON b.id = r.browser JOIN ' +
+				'test t ON t.id = r.test ' +
+			'ORDER BY datetime(r.date) DESC'
 		, function (err, rows) {
 			if (!err) fn(rows);
 			else console.log(err.message);
+		});
+	});
+	
+	// request results for a bar graph of averages per os per test
+	socket.on('get:averages', function (fn) {
+		var tests = [];
+		
+		db.all('SELECT * FROM test', function (err, rows) {
+			if (!err) {
+				var sql = db.prepare(
+					'SELECT ' +
+						'o.name AS "os", ' +
+						'r.data AS "data" ' +
+					'FROM result r JOIN ' +
+						'os o ON o.id = r.os ' +
+					'WHERE r.test = ? ' +
+					'GROUP BY "os" ' +
+					'ORDER BY datetime(r.date) DESC, "os" ASC'
+				);
+				
+				rows.forEach(function (test) {
+					sql.all(test.id, function (err, results) {
+						if (!err) {
+							test.results = results;
+							tests.push(test);
+							
+							// we must be all done here...
+							if (tests.length == rows.length) fn(tests);
+						} else console.log(err.message);
+					});
+				});
+			} else console.log(err.message);
 		});
 	});
 	

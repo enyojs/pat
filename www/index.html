@@ -18,13 +18,17 @@
 		
 		<div id='header'>
 			<h1>Performance Analysis Tests</h1>
-			<h4 class='platform-info'></h4>
+			<h2 class='platform-info'></h2>
+			<div class='running-test'>
+				<h4 class='name'></h4>
+				<h4 class='description'></h4>
+			</div>
 			<div class='flex'>
 				<div class='tests'></div>
 				<div class='controls'>
 					<input type='button' onclick='selectAllTests();' value='Select All' />
 					<input type='button' onclick='deselectAllTests();' value='Deselect All'/>
-					<input id='run-button' type='button' onclick='runAllTests();' disabled value='Run' />
+					<input id='run-button' type='button' onclick='runTests();' disabled value='Run' />
 				</div>
 			</div>
 		</div>
@@ -33,6 +37,10 @@
 		
 		<script type='text/javascript'>
 			socket.on('connect', function () {
+				// we need to identify the platform for the datasource
+				socket.emit('set:os', platform.os);
+				socket.emit('set:platform', platform.platform);
+				socket.emit('set:browser', platform.browser);
 				socket.emit('get:tests', function (tests) {
 					var len = tests.length;
 					tests.forEach(function (filepath) {

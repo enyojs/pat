@@ -18,12 +18,11 @@
 		<script type='text/javascript' src='/bower_components/jqplot-bower/dist/jquery.jqplot.min.js'></script>
 		<script type='text/javascript' src='/bower_components/jqplot-bower/dist/plugins/jqplot.barRenderer.min.js'></script>
 		<script type='text/javascript' src='/socket.io/socket.io.js'></script>
-		<script type='text/javascript' src='/js/platform.js'></script>
 		<script type='text/javascript' src='/js/socket.js'></script>
-		<input type='button' value='Run Tests' onclick='javascript:history.back();' />
-		<div id='results-container'>
-			<div id='chart-results'></div>
-			<table id='table-results'>
+		<!-- <input type='button' value='Run Tests' onclick='javascript:history.back();' /> -->
+		
+		<div id='table'>
+			<table class='results'>
 				<thead>
 					<tr>
 						<th>OS</th>
@@ -42,58 +41,59 @@
 			</table>
 		</div>
 		
+		<div id='averages'>
+			
+		</div>
+		
 		<script type='text/javascript'>
-			socket.emit('table-results', function (results) {
-				window.tableResults = results.slice();
+		socket.on('connect', function () {
+			socket.emit('get:results', function (results) {
 				
 				// setup our table
-				var tbody = $('#table-results > tbody')[0];
+				var tbody = $('#table .results tbody');
 				
 				results.forEach(function (row) {
-					$(tbody).append(
+					var data = JSON.parse(row.data);
+					tbody.append(
 						'<tr>' +
 						'<td>' + row.os + '</td>' +
 						'<td>' + row.platform + '</td>' +
 						'<td>' + row.browser + '</td>' +
-						'<td>' + row.test_name + '</td>' +
-						'<td>' + row.total_time.toFixed(4) + '</td>' +
-						'<td>' + row.average.toFixed(4) + '</td>' +
-						'<td>' + row.max.toFixed(4) + '</td>' +
-						'<td>' + row.min.toFixed(4) + '</td>' +
+						'<td>' + row.test + '</td>' +
+						'<td>' + data.total.toFixed(4) + '</td>' +
+						'<td>' + data.average.toFixed(4) + '</td>' +
+						'<td>' + data.max.toFixed(4) + '</td>' +
+						'<td>' + data.min.toFixed(4) + '</td>' +
 						'<td>' + row.date + '</td>' +
 						'</tr>'
 					);
 				});
 				
-				$('#table-results').dataTable({
+				$('#table .results').dataTable({
 					bJQueryUI: true
 				});
 			});
-			socket.emit('bar-chart-results', function (results) {
+			
+			socket.emit('get:averages', function (results) {
+				var testNames = []
+					, testData = [];
 				
-				console.log(results);
+				results.forEach(function (test, idx) {
+					var data = testData[idx] || (testData[idx] = []);
+					
+					testNames.push(test.name);
+					data.push(
+						test.results.map(function (result) {
+							return JSON.parse(result.data).average;
+						});
+					);
+				});
 				
-				// window.barChartResults = results.slice();
-				
-				// process for our graph
-				// $.jqplot('chart-results', results.map(function (row) {
-				// 	return [row.total_time.toFixed(4)];
-				// }), {
-				// 	pointLabels: {
-				// 		show: true,
-				// 		location: 'e',
-				// 		edgeTolerance: -15
-				// 	},
-				// 	seriesDefaults: {
-				// 		renderer: $.jqplot.BarRenderer,
-				// 		rendererOptions: {
-				// 			fillToZero: true,
-				// 			barDirection: 'horizontal'
-				// 		}
-				// 	}
-				// });
+				// need to get the data associated 
+				$.jqplot('averages', )
 				
 			});
+		});
 		</script>
 	</body>
 </html>

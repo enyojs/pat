@@ -19,6 +19,7 @@
 		<script type='text/javascript' src='/bower_components/jqplot-bower/dist/plugins/jqplot.barRenderer.min.js'></script>
 		<script type='text/javascript' src='/bower_components/jqplot-bower/dist/plugins/jqplot.categoryAxisRenderer.min.js'></script>
 		<script type='text/javascript' src='/bower_components/jqplot-bower/dist/plugins/jqplot.pointLabels.min.js'></script>
+		<script type='text/javascript' src='/bower_components/jqplot-bower/dist/plugins/jqplot.dateAxisRenderer.min.js'></script>
 		<script type='text/javascript' src='/socket.io/socket.io.js'></script>
 		<script type='text/javascript' src='/js/socket.js'></script>
 		
@@ -43,11 +44,11 @@
 		</div>
 		
 		<div id='averages'></div>
+		<div id='trends'></div>
 		
 		<script type='text/javascript'>
 		socket.on('connect', function () {
 			socket.emit('get:results', function (results) {
-				
 				// setup our table
 				var tbody = $('#table .results tbody');
 				
@@ -69,29 +70,32 @@
 				});
 				
 				$('#table .results').dataTable({
-					bJQueryUI: true
+					bJQueryUI: true,
+					aaSorting: [[8, 'desc']]
 				});
 			});
 			
 			socket.emit('get:averages', function (results) {
-				var data = []
-					, testNames = []
-					, osNames = [];
-				
-				results.forEach(function (os, idx) {
-					var row = [];
-					osNames.push(os.name);
-					data.push(row);
-					os.results.forEach(function (result) {
-						result.data = JSON.parse(result.data);
-						if (-1 == testNames.indexOf(result.test)) testNames.push(result.test);
-						row.push(result.data.average);
+				var testNames = Object.keys(results)
+					, labelNames = []
+					, data = [];
+					
+				testNames.forEach(function (test) {
+					var rows = results[test];
+					rows.forEach(function (row, idx) {
+						var label = row.os + ' ' + row.platform + ' ' + row.browser
+							, entries = data[idx] || (data[idx] = []);
+						
+						row.data = JSON.parse(row.data);
+						if (-1 == labelNames.indexOf(label)) labelNames.push(label);
+						
+						entries.push(row.data.average);
 					});
 				});
 				
 				// need to get the data associated 
 				$.jqplot('averages', data, {
-					title: 'Most recent averages per OS, per test',
+					title: 'Most recent averages per OS, platform and browser, per test',
 					cursor: {
 						show: true
 					},
@@ -110,7 +114,8 @@
 							barWidth: 25
 						}
 					},
-					series: osNames.map(function (os) { return {label: os}; }),
+					// series: osNames.map(function (os) { return {label: os}; }),
+					series: labelNames.map(function (name) { return {label: name}; }),
 					grid: {
 						shadow: false,
 						background: '#fff',
@@ -133,6 +138,55 @@
 							renderer: $.jqplot.CategoryAxisRenderer
 						}
 					}
+				});
+			});
+			
+			socket.emit('get:trends', function (results) {
+				var root = $('#trends')
+					, platforms = Object.keys(results);
+				platforms.forEach(function (name) {
+					var platform = results[name]
+						, trend = $('<div class="trend"></div>')
+						, testNames = Object.keys(platform)
+						, data = [];
+					trend.attr('id', name.toLowerCase().replace(/\s+/g, '') + '-trend');
+					root.append(trend);
+					
+					testNames.forEach(function (test) {
+						// var row = data[idx] || (data[idx] = []);
+						// row.push(platform[test]);
+						data.push(platform[test]);
+					});
+					$.jqplot(trend.attr('id'), data, {
+						title: name,
+						cursor: {
+							show: true
+						},
+						seriesDefaults: {
+							shadow: false,
+							showMarker: false
+						},
+						series: testNames.map(function (name) { return {label: name}; }),
+						grid: {
+							shadow: false,
+							background: '#fff',
+							borderWidth: 1
+						},
+						legend: {
+							show: true,
+							placement: 'outsideGrid'
+						},
+						axesDefaults: {
+						},
+						axes: {
+							xaxis: {
+								renderer: $.jqplot.DateAxisRenderer,
+								tickOptions: {
+									formatString: '%#d/%#m %T'
+								}
+							}
+						}
+					});
 				});
 			});
 		});

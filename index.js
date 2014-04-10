@@ -77,34 +77,69 @@ io.sockets.on('connection', function (socket) {
 	
 	// request results for a bar graph of averages per os per test
 	socket.on('get:averages', function (fn) {
-		var oss = [];
-		
-		db.all('SELECT * FROM os', function (err, rows) {
+		db.all(
+			'SELECT ' +
+				'o.name AS "os", ' +
+				'b.name AS "browser", ' +
+				'p.name AS "platform", ' +
+				't.name AS "test", ' +
+				'r.data AS "data", ' +
+				'r.date AS "date" ' +
+			'FROM result r ' +
+			'JOIN os o ON o.id = r.os ' +
+			'JOIN platform p ON p.id = r.platform ' +
+			'JOIN browser b on b.id = r.browser ' +
+			'JOIN test t ON t.id = r.test ' +
+			'GROUP BY "os", "platform", "browser", "test" ' +
+			'ORDER BY datetime(r.date) DESC, "os", "platform", "browser"'
+		, function (err, rows) {
 			if (!err) {
-				var sql = db.prepare(
-					'SELECT ' +
-						't.name AS "test", ' +
-						'r.data AS "data" ' +
-					'FROM result r JOIN ' +
-						'test t ON t.id = r.test ' +
-					'WHERE r.os = ? ' +
-					'GROUP BY "test" ' +
-					'ORDER BY datetime(r.date) DESC, "test" ASC'
-				);
 				
-				rows.forEach(function (os) {
-					sql.all(os.id, function (err, results) {
-						if (!err) {
-							os.results = results;
-							oss.push(os);
-							
-							// we must be all done here...
-							if (oss.length == rows.length) fn(oss);
-						} else console.log(err.message);
-					});
+				var tests = {};
+				
+				rows.forEach(function (row) {
+					var entries = tests[row.test] || (tests[row.test] = []);
+					entries.push(row);
 				});
+				
+				fn(tests);
 			} else console.log(err.message);
 		});
+	});
+	
+	// return the trend-sets for each platform by test
+	socket.on('get:trends', function (fn) {
+		db.all(
+			'SELECT ' +
+				'o.name AS "os", ' +
+				'b.name AS "browser", ' +
+				'p.name AS "platform", ' +
+				'r.data AS "data", ' +
+				't.name AS "test", ' +
+				'r.date AS "date" ' +
+			'FROM result r JOIN ' +
+				'os o ON o.id = r.os JOIN ' +
+				'platform p ON p.id = r.platform JOIN ' +
+				'browser b ON b.id = r.browser JOIN ' +
+				'test t ON t.id = r.test ' +
+			'ORDER BY datetime(r.date) ASC'
+			, function (err, results) {
+				if (!err) {
+					var trends = {};
+					
+					results.forEach(function (row) {
+						var label = row.os + ' ' + row.platform + ' ' + row.browser
+							, entry = trends[label] || (trends[label] = {})
+							, values = entry[row.test] || (entry[row.test] = []);
+							
+						row.data = JSON.parse(row.data);
+						values.push([row.date, row.data.average]);
+					});
+					
+					fn(trends);
+				} else console.log(err.message);
+			}
+		)
 	});
 	
 	// will return the dynamically built list of tests with their filenames pathed such that

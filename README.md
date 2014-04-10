@@ -1,3 +1,5 @@
+> This is a very rough initial pass to get started
+
 ### Performance Analysis Tool
 
 This tool is designed to aid in simple, automatable performance tests running in the browser.

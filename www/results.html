@@ -159,12 +159,8 @@
 					});
 					$.jqplot(trend.attr('id'), data, {
 						title: name,
-						cursor: {
-							show: true
-						},
 						seriesDefaults: {
 							shadow: false,
-							showMarker: false
 						},
 						series: testNames.map(function (name) { return {label: name}; }),
 						grid: {
@@ -176,14 +172,16 @@
 							show: true,
 							placement: 'outsideGrid'
 						},
-						axesDefaults: {
-						},
 						axes: {
 							xaxis: {
-								renderer: $.jqplot.DateAxisRenderer,
 								tickOptions: {
-									formatString: '%#d/%#m %T'
+									show: false
 								}
+								// renderer: $.jqplot.DateAxisRenderer,
+								// tickOptions: {
+								// 	// US style...
+								// 	formatString: '%#m/%#d'
+								// }
 							}
 						}
 					});

@@ -130,10 +130,24 @@ io.sockets.on('connection', function (socket) {
 					results.forEach(function (row) {
 						var label = row.os + ' ' + row.platform + ' ' + row.browser
 							, entry = trends[label] || (trends[label] = {})
-							, values = entry[row.test] || (entry[row.test] = []);
+							, values = entry[row.test] || (entry[row.test] = [])
+							, date;
 							
 						row.data = JSON.parse(row.data);
-						values.push([row.date, row.data.average]);
+						values.push(row.data.average);
+						// date = new Date(row.date);
+						// date = date.getMonth() + '/' + date.getDay() + '/' + date.getFullYear();
+						// 
+						// var idx = -1;
+						// values.forEach(function (entry, i) {
+						// 	if (entry[0] == date) idx = i;
+						// });
+						// 
+						// if (idx !== -1) {
+						// 	// help calculate mean
+						// 	var entry = values[idx];
+						// 	entry[1] = (entry[1] + row.data.average) / 2;
+						// } else values.push([date, row.data.average]);
 					});
 					
 					fn(trends);
